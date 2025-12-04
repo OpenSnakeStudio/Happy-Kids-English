@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import confetti from 'canvas-confetti';
 import { QuizItem, WrongAnswer } from '../types';
+import { playSFX } from '../services/audioService';
 
 interface QuizGameProps {
   questions: QuizItem[];
@@ -14,6 +16,7 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit 
   const [isAnswered, setIsAnswered] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [wrongAnswers, setWrongAnswers] = useState<WrongAnswer[]>([]);
+  const [shake, setShake] = useState(false);
 
   const currentQ = questions[currentIdx];
 
@@ -40,8 +43,18 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit 
 
     if (option === currentQ.correctAnswer) {
       setScore(s => s + 1);
-      // Play correct sound effect (optional, visual is enough for now)
+      playSFX('correct');
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#FFC107', '#4ECDC4', '#FF6B6B']
+      });
     } else {
+      playSFX('wrong');
+      setShake(true);
+      setTimeout(() => setShake(false), 500);
+      
       // Record wrong answer
       setWrongAnswers(prev => [...prev, {
         quizItem: currentQ,
@@ -51,6 +64,7 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit 
   };
 
   const nextQuestion = () => {
+    playSFX('click');
     setIsAnswered(false);
     setSelectedAnswer(null);
     setShowFeedback(false);
@@ -59,6 +73,10 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit 
       setCurrentIdx(c => c + 1);
     } else {
       // Pass both score and wrong answers list
+      // Play win sound if score is good
+      if (score > questions.length / 2) {
+        playSFX('win');
+      }
       onFinish(score, wrongAnswers); 
     }
   };
@@ -69,7 +87,7 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit 
     <div className="w-full max-w-2xl mx-auto px-4">
       {/* Top Bar */}
       <div className="flex justify-between items-center mb-6">
-        <button onClick={onExit} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
+        <button onClick={() => { playSFX('click'); onExit(); }} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
           ✕ 離開
         </button>
         <div className="flex-1 mx-4 bg-gray-200 rounded-full h-4">
@@ -84,7 +102,7 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit 
       </div>
 
       {/* Question Card */}
-      <div className="bg-white rounded-3xl shadow-xl p-8 mb-6 text-center relative overflow-hidden">
+      <div className={`bg-white rounded-3xl shadow-xl p-8 mb-6 text-center relative overflow-hidden ${shake ? 'animate-shake' : ''}`}>
         <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-purple-400"></div>
         
         <h2 className="text-3xl font-bold text-gray-800 mb-4 leading-relaxed">

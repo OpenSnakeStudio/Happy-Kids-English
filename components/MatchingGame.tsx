@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import confetti from 'canvas-confetti';
 import { VocabularyItem } from '../types';
+import { playSFX } from '../services/audioService';
 
 interface MatchingGameProps {
   vocabulary: VocabularyItem[];
@@ -52,6 +54,7 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ vocabulary, onFinish
 
     // First card selected
     if (!selectedCardId) {
+      playSFX('click');
       setSelectedCardId(card.id);
       speak(card.type === 'word' ? card.content : ''); // Speak if it's the English word
       return;
@@ -66,6 +69,14 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ vocabulary, onFinish
     // Check Match
     if (prevCard.vocabIndex === card.vocabIndex) {
       // Match!
+      playSFX('correct');
+      confetti({
+        particleCount: 50,
+        spread: 50,
+        origin: { y: 0.6 },
+        startVelocity: 30,
+        gravity: 2,
+      });
       speak("Great!");
       setCards(prev => prev.map(c => 
         (c.id === card.id || c.id === prevCard.id) 
@@ -76,6 +87,7 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ vocabulary, onFinish
       setIsProcessing(false);
     } else {
       // No Match
+      playSFX('wrong');
       setTimeout(() => {
         setSelectedCardId(null);
         setIsProcessing(false);
@@ -94,11 +106,21 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ vocabulary, onFinish
 
   const allMatched = cards.length > 0 && cards.every(c => c.isMatched);
 
+  useEffect(() => {
+    if (allMatched) {
+      playSFX('win');
+      confetti({
+        particleCount: 200,
+        spread: 160,
+      });
+    }
+  }, [allMatched]);
+
   return (
     <div className="w-full max-w-4xl mx-auto px-4">
        {/* Header */}
        <div className="flex justify-between items-center mb-6">
-        <button onClick={onExit} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
+        <button onClick={() => { playSFX('click'); onExit(); }} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
           ✕ 離開
         </button>
         <h2 className="text-2xl font-bold text-secondary animate-bounce">
@@ -126,7 +148,7 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ vocabulary, onFinish
              baseClasses += "bg-white hover:bg-gray-50 cursor-pointer text-gray-700";
           } else if (isProcessing && !isSelected) {
              // Wrong match animation state (simplistic)
-             baseClasses += "bg-red-50 text-gray-400 cursor-not-allowed";
+             baseClasses += "bg-red-50 text-gray-400 cursor-not-allowed animate-shake";
           } else {
              baseClasses += "bg-white hover:bg-sky-50 hover:-translate-y-1 cursor-pointer text-gray-700 border-b-4 border-gray-200";
           }
@@ -152,7 +174,7 @@ export const MatchingGame: React.FC<MatchingGameProps> = ({ vocabulary, onFinish
             <h3 className="text-2xl font-bold text-gray-800 mb-2">太棒了！全部配對成功！</h3>
             <p className="text-gray-500 mb-6">準備好進行最後的測驗了嗎？</p>
             <button
-              onClick={onFinish}
+              onClick={() => { playSFX('click'); onFinish(); }}
               className="w-full bg-secondary text-white py-3 rounded-xl font-bold text-lg shadow-lg hover:brightness-110"
             >
               開始測驗 (Start Quiz) ➜

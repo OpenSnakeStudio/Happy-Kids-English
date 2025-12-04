@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import confetti from 'canvas-confetti';
 import { VocabularyItem } from '../types';
+import { playSFX } from '../services/audioService';
 
 interface SpeakingGameProps {
   vocabulary: VocabularyItem[];
@@ -51,12 +53,19 @@ export const SpeakingGame: React.FC<SpeakingGameProps> = ({ vocabulary, onFinish
       // Simple fuzzy match check (includes or equals)
       if (spokenText === targetText || spokenText.includes(targetText)) {
         setStatus('success');
+        playSFX('correct');
+        confetti({
+          particleCount: 100,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
         speak("Excellent!");
         setTimeout(() => {
           handleNext();
         }, 1500);
       } else {
         setStatus('fail');
+        playSFX('wrong');
         speak("Try again");
       }
     };
@@ -66,6 +75,7 @@ export const SpeakingGame: React.FC<SpeakingGameProps> = ({ vocabulary, onFinish
       setIsListening(false);
       setStatus('fail'); // Treat error as fail for simplicity to user
       setTranscript('聽不清楚，再試一次？');
+      playSFX('wrong');
     };
 
     recognition.onend = () => {
@@ -80,6 +90,7 @@ export const SpeakingGame: React.FC<SpeakingGameProps> = ({ vocabulary, onFinish
     if (currentIndex < vocabulary.length - 1) {
       setCurrentIndex(p => p + 1);
     } else {
+      playSFX('win');
       onFinish();
     }
   };
@@ -104,7 +115,7 @@ export const SpeakingGame: React.FC<SpeakingGameProps> = ({ vocabulary, onFinish
   return (
     <div className="w-full max-w-xl mx-auto px-4">
       <div className="flex justify-between items-center mb-6">
-        <button onClick={onExit} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
+        <button onClick={() => { playSFX('click'); onExit(); }} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
           ✕ 離開
         </button>
         <h2 className="text-2xl font-bold text-purple-600">
@@ -136,7 +147,7 @@ export const SpeakingGame: React.FC<SpeakingGameProps> = ({ vocabulary, onFinish
             w-32 h-32 rounded-full flex items-center justify-center text-5xl shadow-lg transition-all transform
             ${status === 'listening' ? 'bg-red-500 text-white animate-pulse scale-110' : ''}
             ${status === 'success' ? 'bg-green-500 text-white scale-100' : ''}
-            ${status === 'fail' ? 'bg-gray-200 text-gray-400 animate-wiggle' : ''}
+            ${status === 'fail' ? 'bg-gray-200 text-gray-400 animate-shake' : ''}
             ${status === 'idle' ? 'bg-purple-100 text-purple-600 hover:bg-purple-200 hover:scale-105' : ''}
           `}
         >

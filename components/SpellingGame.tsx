@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import confetti from 'canvas-confetti';
 import { VocabularyItem } from '../types';
+import { playSFX } from '../services/audioService';
 
 interface SpellingGameProps {
   vocabulary: VocabularyItem[];
@@ -28,17 +30,26 @@ export const SpellingGame: React.FC<SpellingGameProps> = ({ vocabulary, onFinish
     e.preventDefault();
     if (userInput.trim().toLowerCase() === currentWord.word.toLowerCase()) {
       setFeedback('correct');
-      // Play sound
+      // Play sound and confetti
+      playSFX('correct');
+      confetti({
+        particleCount: 100,
+        spread: 60,
+        origin: { y: 0.6 }
+      });
       speak("Correct!");
+      
       setTimeout(() => {
         if (currentIndex < vocabulary.length - 1) {
           setCurrentIndex(p => p + 1);
         } else {
+          playSFX('win');
           onFinish(); // All done
         }
       }, 1500);
     } else {
       setFeedback('wrong');
+      playSFX('wrong');
       speak("Try again");
       setTimeout(() => setFeedback('neutral'), 1000);
     }
@@ -53,6 +64,7 @@ export const SpellingGame: React.FC<SpellingGameProps> = ({ vocabulary, onFinish
   };
 
   const showHint = () => {
+    playSFX('click');
     // Reveal a random index that isn't already revealed or first letter
     const len = currentWord.word.length;
     const randomIdx = Math.floor(Math.random() * len);
@@ -60,13 +72,10 @@ export const SpellingGame: React.FC<SpellingGameProps> = ({ vocabulary, onFinish
     inputRef.current?.focus();
   };
 
-  // Mask logic for visual aid (optional, here we just ask them to type whole word)
-  // But let's show blank lines _ _ _ _ above
-  
   return (
     <div className="w-full max-w-xl mx-auto px-4">
       <div className="flex justify-between items-center mb-6">
-        <button onClick={onExit} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
+        <button onClick={() => { playSFX('click'); onExit(); }} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
           ✕ 離開
         </button>
         <h2 className="text-2xl font-bold text-sky-600">
@@ -109,7 +118,7 @@ export const SpellingGame: React.FC<SpellingGameProps> = ({ vocabulary, onFinish
               w-full text-center text-3xl font-bold py-4 rounded-xl border-2 outline-none transition-all
               ${feedback === 'neutral' ? 'border-gray-200 focus:border-sky-400 text-gray-800' : ''}
               ${feedback === 'correct' ? 'border-green-500 bg-green-50 text-green-600' : ''}
-              ${feedback === 'wrong' ? 'border-red-400 bg-red-50 text-red-600 animate-wiggle' : ''}
+              ${feedback === 'wrong' ? 'border-red-400 bg-red-50 text-red-600 animate-shake' : ''}
             `}
             placeholder="Type the word..."
             autoFocus

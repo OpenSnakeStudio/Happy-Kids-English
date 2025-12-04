@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { VocabularyItem } from '../types';
+import { playSFX } from '../services/audioService';
 
 interface StudyModeProps {
   topic: string;
@@ -29,6 +30,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
   }, [currentIdx, currentWord]);
 
   const handleNext = () => {
+    playSFX('click');
     if (currentIdx < vocabulary.length - 1) {
       setCurrentIdx(p => p + 1);
     } else {
@@ -37,6 +39,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
   };
 
   const handlePrev = () => {
+    playSFX('click');
     if (currentIdx > 0) {
       setCurrentIdx(p => p - 1);
     }
@@ -46,7 +49,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
     <div className="w-full max-w-2xl mx-auto px-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <button onClick={onExit} className="text-gray-400 hover:text-red-500 font-bold px-3">
+        <button onClick={() => { playSFX('click'); onExit(); }} className="text-gray-400 hover:text-red-500 font-bold px-3">
           ✕ 離開
         </button>
         <div className="text-center">
