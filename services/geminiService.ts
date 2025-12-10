@@ -23,31 +23,41 @@ export const generateLessonForGrade = async (
   
   if (subject === 'ENGLISH') {
     let levelDesc = "";
-    if (grade <= 2) levelDesc = "Beginner (A1). Concrete nouns, basic verbs, colors, numbers.";
-    else if (grade <= 4) levelDesc = "Elementary (A1-A2). Daily routines, school, weather.";
-    else levelDesc = "Intermediate (A2). Past tense, future plans, expressing feelings.";
+    if (grade <= 2) levelDesc = "Beginner (A1). Concrete nouns, basic verbs, colors, numbers. Very simple sentences.";
+    else if (grade <= 4) levelDesc = "Elementary (A1-A2). Daily routines, school, weather. Simple present/past tense.";
+    else levelDesc = "Intermediate (A2). Past tense, future plans, expressing feelings, opinions.";
 
-    const categories = [
-      "Fantasy & Magic", "Science & Space", "Animals & Nature", "Adventure & Mystery",
-      "Daily Life & Fun", "Hobbies & Sports", "Food & Cooking", "Travel & Places", "Occupations"
-    ];
-    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+    let selectedTopic = specificTopic || "";
+    let themeInstruction = "";
+
+    // Handle "Surprise Me" or empty topic
+    if (!selectedTopic || selectedTopic === "Surprise Me") {
+        themeInstruction = `
+          Task: First, invent a creative, fun, and engaging theme suitable for Grade ${grade} kids (e.g., Pirates, Underwater, Space, Magic, Supermarket, Dinosaurs, Detective, etc.). 
+          Do NOT use generic themes like "English". Pick something specific and exciting.
+          Then create the lesson based on that invented theme.
+        `;
+    } else {
+        themeInstruction = `Scenario/Theme: "${selectedTopic}".`;
+    }
 
     subjectPrompt = `
       Subject: English Learning (EFL for Taiwan/Hong Kong kids).
       Target Audience: Grade ${grade} (${levelDesc}).
-      Category: "${randomCategory}".
+      ${themeInstruction}
       
       Tasks:
-      1. Create a fun topic title.
-      2. Select ${questionCount} vocabulary words.
-      3. Create ${questionCount} multiple-choice questions testing these words.
+      1. Create a fun, catchy title for this lesson based on the theme.
+      2. Select ${questionCount} vocabulary words related to this specific theme.
+         - Words must be appropriate for Grade ${grade} level.
+         - If the theme is "Minecraft" or "Games", use words like 'Build', 'Block', 'Creeper', 'Dig' etc but keep it educational.
+      3. Create ${questionCount} multiple-choice questions testing these words in the context of the theme.
       
       Format Requirements:
       - 'word': The English word.
       - 'chinese': Traditional Chinese meaning.
       - 'partOfSpeech': e.g., n., v., adj.
-      - 'exampleSentence': Simple English sentence using the word.
+      - 'exampleSentence': A simple sentence using the word, fitting the theme.
       - 'exampleTranslation': Chinese translation of the sentence.
       - 'emoji': A relevant emoji.
     `;

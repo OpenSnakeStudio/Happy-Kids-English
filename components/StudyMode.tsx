@@ -20,7 +20,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
   const isWriting = subject === 'WRITING';
   const shouldSpeak = !isMath && !isWriting; // Only speak for English
 
-  const speak = (text: string) => {
+  const speak = (text: string, speed: number = 0.9) => {
     // Disable speak for Math and Writing
     if (!shouldSpeak) return;
 
@@ -30,7 +30,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
       const spokenText = text.replace(/_+/g, ' blank ');
       const utterance = new SpeechSynthesisUtterance(spokenText);
       utterance.lang = 'en-US';
-      utterance.rate = 0.8;
+      utterance.rate = speed;
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -38,7 +38,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
   // Auto-speak when sliding to a new card (Only if English)
   useEffect(() => {
     if (shouldSpeak) {
-      speak(currentWord.word);
+      speak(currentWord.word, 0.9);
     }
   }, [currentIdx, currentWord, shouldSpeak]);
 
@@ -102,13 +102,24 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
                 {isMath ? '觀念' : (isWriting ? '技巧' : currentWord.partOfSpeech)}
               </span>
               {shouldSpeak && (
-                <button 
-                  onClick={() => speak(currentWord.word)}
-                  className="bg-primary hover:bg-yellow-400 text-yellow-900 rounded-full p-2 transition-transform hover:scale-110 active:scale-95 shadow-sm"
-                  aria-label="Play pronunciation"
-                >
-                  🔊
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => speak(currentWord.word, 0.9)}
+                    className="bg-primary hover:bg-yellow-400 text-yellow-900 rounded-full w-10 h-10 flex items-center justify-center transition-transform hover:scale-110 active:scale-95 shadow-sm"
+                    aria-label="Play pronunciation"
+                    title="Normal Speed"
+                  >
+                    🔊
+                  </button>
+                  <button 
+                    onClick={() => speak(currentWord.word, 0.5)}
+                    className="bg-green-100 hover:bg-green-200 text-green-700 rounded-full w-10 h-10 flex items-center justify-center transition-transform hover:scale-110 active:scale-95 shadow-sm"
+                    aria-label="Play slow pronunciation"
+                    title="Slow Speed (0.5x)"
+                  >
+                    🐢
+                  </button>
+                </div>
               )}
             </div>
             {/* Definition */}
@@ -126,9 +137,14 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
                 {isMath ? '公式/重點 (Formula)' : (isWriting ? '範例 (Example)' : 'Example')}
               </span>
               {shouldSpeak && (
-                <button onClick={() => speak(currentWord.exampleSentence)} className="text-sky-500 hover:text-sky-600 text-sm font-bold">
-                  🔊 Listen
-                </button>
+                <div className="flex gap-2">
+                  <button onClick={() => speak(currentWord.exampleSentence, 0.9)} className="text-sky-500 hover:text-sky-600 text-sm font-bold flex items-center gap-1">
+                    🔊 Listen
+                  </button>
+                  <button onClick={() => speak(currentWord.exampleSentence, 0.5)} className="text-green-600 hover:text-green-700 text-sm font-bold flex items-center gap-1">
+                    🐢 Slow
+                  </button>
+                </div>
               )}
             </div>
             

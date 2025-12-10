@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import { VocabularyItem } from '../types';
@@ -37,7 +38,7 @@ export const SpellingGame: React.FC<SpellingGameProps> = ({ vocabulary, onFinish
         spread: 60,
         origin: { y: 0.6 }
       });
-      speak("Correct!");
+      speak("Correct!", 1);
       
       setTimeout(() => {
         if (currentIndex < vocabulary.length - 1) {
@@ -50,15 +51,16 @@ export const SpellingGame: React.FC<SpellingGameProps> = ({ vocabulary, onFinish
     } else {
       setFeedback('wrong');
       playSFX('wrong');
-      speak("Try again");
+      speak("Try again", 1);
       setTimeout(() => setFeedback('neutral'), 1000);
     }
   };
 
-  const speak = (text: string) => {
+  const speak = (text: string, speed: number = 0.9) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
+      utterance.rate = speed;
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -125,13 +127,22 @@ export const SpellingGame: React.FC<SpellingGameProps> = ({ vocabulary, onFinish
           />
           
           <div className="flex justify-between items-center mt-6">
-            <button 
-              type="button" 
-              onClick={() => speak(currentWord.word)}
-              className="text-gray-400 hover:text-sky-500 font-bold text-sm flex items-center gap-1"
-            >
-              🔊 Listen
-            </button>
+            <div className="flex gap-2">
+              <button 
+                type="button" 
+                onClick={() => speak(currentWord.word, 0.9)}
+                className="text-gray-400 hover:text-sky-500 font-bold text-sm flex items-center gap-1"
+              >
+                🔊 Listen
+              </button>
+              <button 
+                type="button" 
+                onClick={() => speak(currentWord.word, 0.5)}
+                className="text-gray-400 hover:text-green-600 font-bold text-sm flex items-center gap-1"
+              >
+                🐢 Slow
+              </button>
+            </div>
 
             <button 
               type="button"

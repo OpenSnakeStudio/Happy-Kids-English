@@ -25,7 +25,7 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
   const isWriting = subject === 'WRITING';
   const shouldSpeak = !isMath && !isWriting;
 
-  const handleSpeech = (text: string) => {
+  const handleSpeech = (text: string, speed: number = 0.9) => {
     // Disable speech for Math and Writing
     if (!shouldSpeak) return;
 
@@ -35,7 +35,7 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
       
       const utterance = new SpeechSynthesisUtterance(spokenText);
       utterance.lang = 'en-US';
-      utterance.rate = 0.8; // Slower for kids
+      utterance.rate = speed; 
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -43,7 +43,7 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
   useEffect(() => {
     // Auto speak question when it loads (ONLY if NOT Math/Writing)
     if (shouldSpeak) {
-      handleSpeech(questions[currentIdx].question);
+      handleSpeech(questions[currentIdx].question, 0.9);
     }
   }, [currentIdx, questions, shouldSpeak]);
 
@@ -123,12 +123,20 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
         </h2>
         
         {shouldSpeak && (
-          <button 
-            onClick={() => handleSpeech(currentQ.question)}
-            className="bg-blue-100 text-blue-600 hover:bg-blue-200 px-4 py-2 rounded-full text-sm font-bold mb-4 inline-flex items-center gap-2 transition-colors"
-          >
-            🔊 聽題目 (Listen)
-          </button>
+          <div className="flex justify-center gap-3 mb-4">
+            <button 
+              onClick={() => handleSpeech(currentQ.question, 0.9)}
+              className="bg-blue-100 text-blue-600 hover:bg-blue-200 px-4 py-2 rounded-full text-sm font-bold inline-flex items-center gap-2 transition-colors"
+            >
+              🔊 聽題目 (Listen)
+            </button>
+            <button 
+              onClick={() => handleSpeech(currentQ.question, 0.5)}
+              className="bg-green-100 text-green-600 hover:bg-green-200 px-4 py-2 rounded-full text-sm font-bold inline-flex items-center gap-2 transition-colors"
+            >
+              🐢 慢速 (Slow)
+            </button>
+          </div>
         )}
 
         <p className="text-gray-500 text-lg mb-2 font-medium">

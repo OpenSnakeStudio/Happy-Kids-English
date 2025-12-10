@@ -12,7 +12,8 @@ import { NumberPuzzleGame } from './components/NumberPuzzleGame';
 import { GeometryBuilderGame } from './components/GeometryBuilderGame';
 import { SentenceBuilderGame } from './components/SentenceBuilderGame';
 import { IdiomDojoGame } from './components/IdiomDojoGame';
-import { MathTopicSelection } from './components/MathTopicSelection'; // Import new component
+import { MathTopicSelection } from './components/MathTopicSelection';
+import { EnglishTopicSelection } from './components/EnglishTopicSelection'; // Import new component
 import { generateLessonForGrade } from './services/geminiService';
 import { GradeLevel, AppState, WrongAnswer, Subject } from './types';
 import { playSFX } from './services/audioService';
@@ -32,7 +33,7 @@ export default function App() {
   const [state, setState] = useState<AppState>(INITIAL_STATE);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [questionCount, setQuestionCount] = useState<number>(5); 
-  const [selectedTopic, setSelectedTopic] = useState<string | undefined>(undefined); // Track selected math topic
+  const [selectedTopic, setSelectedTopic] = useState<string | undefined>(undefined); // Track selected topic
 
   const handleSubjectSelect = (subject: Subject) => {
     playSFX('click');
@@ -51,13 +52,19 @@ export default function App() {
   const handleGradeSelect = async (grade: GradeLevel) => {
     playSFX('click');
     
-    // If Math, go to Topic Selection first
+    // If Math, go to Math Topic Selection
     if (state.currentSubject === 'MATH') {
       setState(prev => ({ ...prev, currentGrade: grade, gameStatus: 'MATH_TOPIC_SELECTION' }));
       return;
     }
 
-    // Otherwise (English/Writing), generate lesson immediately
+    // If English, go to English Topic Selection
+    if (state.currentSubject === 'ENGLISH') {
+      setState(prev => ({ ...prev, currentGrade: grade, gameStatus: 'ENGLISH_TOPIC_SELECTION' }));
+      return;
+    }
+
+    // Otherwise (Writing), generate lesson immediately
     await generateLesson(grade, state.currentSubject!);
   };
 
@@ -65,6 +72,11 @@ export default function App() {
     setSelectedTopic(topic);
     await generateLesson(state.currentGrade!, 'MATH', topic);
   };
+
+  const handleEnglishTopicSelect = async (topic: string) => {
+    setSelectedTopic(topic);
+    await generateLesson(state.currentGrade!, 'ENGLISH', topic);
+  }
 
   const generateLesson = async (grade: GradeLevel, subject: Subject, topic?: string) => {
     setState(prev => ({ ...prev, isLoading: true, currentGrade: grade, errorMsg: null }));
@@ -133,7 +145,7 @@ export default function App() {
     setState(INITIAL_STATE);
   };
 
-  const speak = (text: string) => {
+  const speak = (text: string, speed: number = 0.9) => {
     // Disable speech for Math and Chinese Writing (as browser TTS logic is typically English-focused here)
     if (state.currentSubject === 'MATH' || state.currentSubject === 'WRITING') return;
 
@@ -142,6 +154,7 @@ export default function App() {
       const spokenText = text.replace(/_+/g, ' blank ');
       const utterance = new SpeechSynthesisUtterance(spokenText);
       utterance.lang = 'en-US';
+      utterance.rate = speed;
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -307,6 +320,15 @@ export default function App() {
           <MathTopicSelection
              grade={state.currentGrade}
              onSelectTopic={handleMathTopicSelect}
+             onBack={() => setState(prev => ({ ...prev, gameStatus: 'MENU' }))}
+          />
+        )}
+
+        {/* 2.6 English Topic Selection */}
+        {!state.isLoading && state.gameStatus === 'ENGLISH_TOPIC_SELECTION' && state.currentGrade && (
+          <EnglishTopicSelection
+             grade={state.currentGrade}
+             onSelectTopic={handleEnglishTopicSelect}
              onBack={() => setState(prev => ({ ...prev, gameStatus: 'MENU' }))}
           />
         )}
@@ -555,6 +577,9 @@ export default function App() {
                     if (state.currentSubject === 'MATH') {
                        // For Math, go back to topic selection for that grade
                        setState(prev => ({ ...prev, gameStatus: 'MATH_TOPIC_SELECTION', score: 0, wrongAnswers: [], lessonData: null }));
+                    } else if (state.currentSubject === 'ENGLISH') {
+                       // For English, go back to topic selection
+                       setState(prev => ({ ...prev, gameStatus: 'ENGLISH_TOPIC_SELECTION', score: 0, wrongAnswers: [], lessonData: null }));
                     } else {
                        handleGradeSelect(state.currentGrade!);
                     }
@@ -586,12 +611,20 @@ export default function App() {
                         <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded">Question {idx + 1}</span>
                         {/* Only show listen button for English */}
                         {isEnglish && (
-                          <button 
-                            onClick={() => speak(wa.quizItem.question)}
-                            className="text-sky-500 hover:text-sky-600 text-sm font-bold"
-                          >
-                            🔊 Listen
-                          </button>
+                          <div className="flex gap-2">
+                            <button 
+                              onClick={() => speak(wa.quizItem.question, 0.9)}
+                              className="text-sky-500 hover:text-sky-600 text-sm font-bold"
+                            >
+                              🔊 Listen
+                            </button>
+                            <button 
+                              onClick={() => speak(wa.quizItem.question, 0.5)}
+                              className="text-green-600 hover:text-green-700 text-sm font-bold"
+                            >
+                              🐢 Slow
+                            </button>
+                          </div>
                         )}
                       </div>
                       

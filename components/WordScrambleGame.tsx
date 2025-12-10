@@ -36,10 +36,11 @@ export const WordScrambleGame: React.FC<WordScrambleGameProps> = ({ vocabulary, 
     setStatus('playing');
   }, [currentIndex, currentWord]);
 
-  const speak = (text: string) => {
+  const speak = (text: string, speed: number = 0.9) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'en-US';
+      utterance.rate = speed;
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -67,10 +68,9 @@ export const WordScrambleGame: React.FC<WordScrambleGameProps> = ({ vocabulary, 
 
   const checkAnswer = () => {
     const currentString = answerLetters.map(l => l.char).join('');
-    const targetString = currentWord.word.trim(); // Case sensitive? Usually keep original casing or lowercase.
+    const targetString = currentWord.word.trim(); 
     
-    // Check ignoring case usually safer for kids, but let's try exact match first or normalize
-    if (currentString === targetString) {
+    if (currentString.toLowerCase() === targetString.toLowerCase()) {
       setStatus('correct');
       playSFX('correct');
       confetti({
@@ -78,7 +78,7 @@ export const WordScrambleGame: React.FC<WordScrambleGameProps> = ({ vocabulary, 
         spread: 70,
         origin: { y: 0.6 }
       });
-      speak("Correct!");
+      speak("Correct!", 1);
       
       setTimeout(() => {
         if (currentIndex < vocabulary.length - 1) {
@@ -91,13 +91,11 @@ export const WordScrambleGame: React.FC<WordScrambleGameProps> = ({ vocabulary, 
     } else {
       setStatus('wrong');
       playSFX('wrong');
-      speak("Try again");
+      speak("Try again", 1);
       
       // Auto-reset after a short delay if wrong
       setTimeout(() => {
         setStatus('playing');
-        // Optional: Move all letters back? Or keep them there?
-        // Let's move them back to help them restart
         setPoolLetters([...poolLetters, ...answerLetters].sort(() => Math.random() - 0.5));
         setAnswerLetters([]);
       }, 1000);
@@ -110,64 +108,72 @@ export const WordScrambleGame: React.FC<WordScrambleGameProps> = ({ vocabulary, 
         <button onClick={() => { playSFX('click'); onExit(); }} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
           ✕ 離開
         </button>
-        <h2 className="text-2xl font-black text-violet-600 tracking-wider">
+        <h2 className="text-2xl font-bold text-violet-600">
           🔤 字母大亂鬥
         </h2>
-        <div className="bg-violet-100 text-violet-700 px-4 py-1 rounded-full font-bold">
+        <div className="text-sm font-bold bg-violet-100 text-violet-600 px-3 py-1 rounded-full">
           {currentIndex + 1} / {vocabulary.length}
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-xl p-8 text-center border-b-8 border-violet-100 min-h-[400px] flex flex-col items-center justify-between">
+      <div className="bg-white rounded-3xl shadow-xl p-8 text-center border-b-8 border-violet-100 min-h-[400px] flex flex-col">
         
-        <div className="w-full">
-            <div className="text-8xl mb-4 animate-bounce-slow filter drop-shadow-sm">
-            {currentWord.emoji}
-            </div>
-            <p className="text-2xl font-bold text-gray-500 mb-2">
-            {currentWord.chinese}
-            </p>
+        <div className="text-7xl mb-2 animate-bounce-slow">
+          {currentWord.emoji}
+        </div>
+        <p className="text-gray-500 text-xl font-medium mb-8">
+          {currentWord.chinese}
+        </p>
+
+        {/* Answer Area */}
+        <div className={`
+           flex flex-wrap justify-center gap-2 mb-8 p-4 rounded-2xl border-4 border-dashed min-h-[80px]
+           ${status === 'correct' ? 'border-green-400 bg-green-50' : 'border-gray-200 bg-gray-50'}
+           ${status === 'wrong' ? 'border-red-400 bg-red-50 animate-shake' : ''}
+        `}>
+           {answerLetters.length === 0 && (
+             <span className="text-gray-300 font-bold flex items-center">點擊字母拼出單字...</span>
+           )}
+           {answerLetters.map((l) => (
+             <button
+               key={l.id}
+               onClick={() => handleAnswerClick(l)}
+               className="w-12 h-12 bg-white rounded-xl text-2xl font-bold shadow-sm border-b-4 border-gray-300 text-gray-800 hover:-translate-y-1 transition-transform"
+             >
+               {l.char}
+             </button>
+           ))}
+        </div>
+
+        {/* Pool Area */}
+        <div className="flex flex-wrap justify-center gap-3 mb-8">
+           {poolLetters.map((l) => (
+             <button
+               key={l.id}
+               onClick={() => handlePoolClick(l)}
+               className="w-14 h-14 bg-violet-500 rounded-xl text-3xl font-bold shadow-md border-b-4 border-violet-700 text-white hover:bg-violet-400 hover:-translate-y-1 active:border-b-0 active:translate-y-1 transition-all"
+             >
+               {l.char}
+             </button>
+           ))}
+        </div>
+
+        <div className="mt-auto flex justify-center gap-4">
             <button 
-                onClick={() => speak(currentWord.word)}
-                className="text-violet-400 hover:text-violet-600 font-bold text-sm flex items-center justify-center gap-1 mx-auto mb-6"
+              type="button" 
+              onClick={() => speak(currentWord.word, 0.9)}
+              className="text-gray-400 hover:text-sky-500 font-bold text-sm flex items-center gap-1 bg-gray-50 px-4 py-2 rounded-full"
             >
-                🔊 聽發音 (Listen)
+              🔊 Listen
+            </button>
+            <button 
+              type="button" 
+              onClick={() => speak(currentWord.word, 0.5)}
+              className="text-gray-400 hover:text-green-600 font-bold text-sm flex items-center gap-1 bg-gray-50 px-4 py-2 rounded-full"
+            >
+              🐢 Slow
             </button>
         </div>
-
-        {/* Answer Slots */}
-        <div className={`
-            flex flex-wrap justify-center gap-2 mb-8 p-4 rounded-xl transition-colors min-h-[80px] w-full items-center
-            ${status === 'correct' ? 'bg-green-100' : 'bg-gray-100'}
-            ${status === 'wrong' ? 'bg-red-100 animate-shake' : ''}
-        `}>
-            {answerLetters.length === 0 && (
-                <span className="text-gray-400 font-medium">點擊下方字母來拼字...</span>
-            )}
-            {answerLetters.map((l) => (
-                <button
-                    key={l.id}
-                    onClick={() => handleAnswerClick(l)}
-                    className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-xl shadow-sm border-b-4 border-gray-200 text-2xl font-bold text-gray-800 flex items-center justify-center hover:-translate-y-1 active:border-b-0 active:translate-y-1 transition-all"
-                >
-                    {l.char}
-                </button>
-            ))}
-        </div>
-
-        {/* Letter Pool */}
-        <div className="flex flex-wrap justify-center gap-3">
-            {poolLetters.map((l) => (
-                <button
-                    key={l.id}
-                    onClick={() => handlePoolClick(l)}
-                    className="w-14 h-14 md:w-16 md:h-16 bg-violet-500 text-white rounded-2xl shadow-lg border-b-4 border-violet-700 text-3xl font-bold flex items-center justify-center hover:bg-violet-400 hover:-translate-y-1 active:border-b-0 active:translate-y-1 transition-all"
-                >
-                    {l.char}
-                </button>
-            ))}
-        </div>
-
       </div>
     </div>
   );
