@@ -14,126 +14,93 @@ export const generateLessonForGrade = async (
   grade: GradeLevel, 
   subject: Subject, 
   questionCount: number = 5,
-  specificTopic?: string // New optional parameter
+  specificTopic?: string
 ): Promise<LessonData | null> => {
   const ai = getGeminiClient();
 
-  // Define prompts based on Subject
   let subjectPrompt = "";
   
   if (subject === 'ENGLISH') {
     let levelDesc = "";
-    if (grade <= 2) levelDesc = "Beginner (A1). Concrete nouns, basic verbs, colors, numbers. Very simple sentences.";
-    else if (grade <= 4) levelDesc = "Elementary (A1-A2). Daily routines, school, weather. Simple present/past tense.";
-    else levelDesc = "Intermediate (A2). Past tense, future plans, expressing feelings, opinions.";
+    if (grade <= 2) levelDesc = "Beginner (A1). Concrete nouns, basic verbs, colors, numbers.";
+    else if (grade <= 4) levelDesc = "Elementary (A1-A2). Daily routines, school, weather.";
+    else levelDesc = "Intermediate (A2). Past tense, future plans, expressing feelings.";
 
     let selectedTopic = specificTopic || "";
     let themeInstruction = "";
 
-    // Handle "Surprise Me" or empty topic
     if (!selectedTopic || selectedTopic === "Surprise Me") {
-        themeInstruction = `
-          Task: First, invent a creative, fun, and engaging theme suitable for Grade ${grade} kids (e.g., Pirates, Underwater, Space, Magic, Supermarket, Dinosaurs, Detective, etc.). 
-          Do NOT use generic themes like "English". Pick something specific and exciting.
-          Then create the lesson based on that invented theme.
-        `;
+        themeInstruction = `Task: First, invent a creative, fun, and engaging theme suitable for Grade ${grade} kids. Then create the lesson based on that theme.`;
     } else {
         themeInstruction = `Scenario/Theme: "${selectedTopic}".`;
     }
 
     subjectPrompt = `
-      Subject: English Learning (EFL for Taiwan/Hong Kong kids).
-      Target Audience: Grade ${grade} (${levelDesc}).
-      ${themeInstruction}
-      
+      Subject: English Learning. Target Audience: Grade ${grade} (${levelDesc}). ${themeInstruction}
       Tasks:
-      1. Create a fun, catchy title for this lesson based on the theme.
-      2. Select ${questionCount} vocabulary words related to this specific theme.
-         - Words must be appropriate for Grade ${grade} level.
-         - If the theme is "Minecraft" or "Games", use words like 'Build', 'Block', 'Creeper', 'Dig' etc but keep it educational.
-      3. Create ${questionCount} multiple-choice questions testing these words in the context of the theme.
-      
-      Format Requirements:
-      - 'word': The English word.
-      - 'chinese': Traditional Chinese meaning.
-      - 'partOfSpeech': e.g., n., v., adj.
-      - 'exampleSentence': A simple sentence using the word, fitting the theme.
-      - 'exampleTranslation': Chinese translation of the sentence.
-      - 'emoji': A relevant emoji.
+      1. Catchy title. 2. Select ${questionCount} vocabulary words. 3. Create ${questionCount} MCQs.
+      'word': English. 'chinese': Traditional Chinese. 'partOfSpeech': n, v, adj. 'exampleSentence': Simple English. 'exampleTranslation': Chinese.
     `;
 
   } else if (subject === 'MATH') {
-    // If specificTopic is provided, use it. Otherwise fall back to general topic (legacy behavior)
     let mathTopic = specificTopic || "";
-    
     if (!mathTopic) {
         if (grade <= 2) mathTopic = "100以內的加減法, 認識圖形";
         else if (grade <= 4) mathTopic = "九九乘法表, 除法基礎, 分數";
         else mathTopic = "小數運算, 因數與倍數, 幾何圖形";
     }
 
-    const mathThemes = ["太空探險", "超級英雄市場", "動物園派對", "魔法學院", "海底世界", "恐龍公園"];
-    const theme = mathThemes[Math.floor(Math.random() * mathThemes.length)];
-
     subjectPrompt = `
-      Subject: Mathematics (Primary School Math for Taiwan).
-      Target Audience: Grade ${grade}.
-      Language: Traditional Chinese (繁體中文).
-      Specific Syllabus Topic: "${mathTopic}".
-      Theme: ${theme} (Use this theme to make word problems fun!).
-      
+      Subject: Mathematics (Primary School Math for Taiwan). Grade: ${grade}. Topic: "${mathTopic}".
       Tasks:
-      1. Choose a sub-concept within the syllabus topic "${mathTopic}".
-      2. 'vocabulary': Define ${questionCount} key math concepts or formulas related to "${mathTopic}".
-         - 'word': The Concept Name in **Traditional Chinese** (e.g., "直角", "分數", "被乘數"). DO NOT use English here.
-         - 'chinese': A simple, fun definition in Chinese suitable for kids.
-         - 'partOfSpeech': Use '數學觀念'.
-         - 'exampleSentence': The Formula, Equation, or a Visual Representation (e.g., "長 × 寬", "90°", "1/2 + 1/2 = 1").
-         - 'exampleTranslation': A **detailed step-by-step** explanation in Chinese of how the formula works or a fun fact.
-      3. 'quiz': Create ${questionCount} math word problems related to "${mathTopic}" and the theme "${theme}".
-         - 'question': The math problem in **Traditional Chinese**. Make it a story! (e.g., "小熊有5個蘋果...")
-         - 'chineseTranslation': Leave this empty string "" since the question is already in Chinese.
-         - 'explanation': A warm, encouraging, **detailed step-by-step** solution in Chinese. Show the calculation process clearly.
-         - 'options': Numbers or Chinese answers.
+      1. 'vocabulary': Define ${questionCount} key math concepts or terms.
+         - 'word': Concept Name in Traditional Chinese.
+         - 'chinese': Simple definition for kids.
+         - 'partOfSpeech': '數學觀念'.
+         - 'exampleSentence': Formula or Equation.
+         - 'exampleTranslation': Step-by-step explanation.
+      2. 'quiz': Create ${questionCount} word problems. Detailed explanations required.
     `;
 
   } else if (subject === 'WRITING') {
-    // UPDATED: Chinese Composition focus
-    let writingFocus = "";
-    if (grade <= 2) writingFocus = "造句練習, 標點符號運用, 簡單的譬喻(像...), 連接詞(因為...所以...), 觀察力培養";
-    else if (grade <= 4) writingFocus = "段落結構(起頭/結尾), 常見成語運用, 排比法, 擬人法, 記敘文(人/事/物)";
-    else writingFocus = "高級修辭(誇飾/借代), 起承轉合架構, 議論文基礎, 抒情文技巧, 豐富的形容詞";
+    let writingTopic = specificTopic || "Creative Writing";
+    if (writingTopic === "Surprise Me") writingTopic = grade <= 2 ? "看圖說話" : (grade <= 4 ? "創意修辭" : "議論文練習");
 
     subjectPrompt = `
-      Subject: Chinese Composition (中文寫作/國語文) for Taiwan Elementary Students.
-      Target Audience: Grade ${grade}.
-      Language: Traditional Chinese (繁體中文).
-      Focus Areas: ${writingFocus}.
+      Subject: Chinese Composition. Grade: ${grade}. Skill: "${writingTopic}".
+      Tasks:
+      1. 'vocabulary': Teach ${questionCount} techniques/idioms.
+         - 'word': Technique name (e.g., 譬喻法).
+         - 'partOfSpeech': '寫作技巧'.
+         - 'exampleTranslation': Analysis of why it's good.
+      2. 'quiz': MCQs identifying techniques or improving sentences.
+    `;
+  } else if (subject === 'SCIENCE') {
+    let scienceTopic = specificTopic || "General Science";
+    if (scienceTopic === "Surprise Me") scienceTopic = grade <= 2 ? "生活中的科學" : (grade <= 4 ? "磁鐵與電" : "簡單機械");
+
+    subjectPrompt = `
+      Subject: Natural Science (Primary School for Taiwan). Grade: ${grade}. Topic: "${scienceTopic}".
+      
+      SPECIAL REQUIREMENT for Science:
+      - The 'vocabulary' items should ideally be categorizable into 2-3 groups (e.g., if topic is "Acids and Bases", 3 items should be acidic, 2 basic).
+      - Put the group name in 'partOfSpeech' (e.g., '酸性', '鹼性', '中性').
+      - If the topic is a process (like Life Cycles), order the vocabulary items chronologically (e.g., Egg -> Larva -> Pupa -> Adult).
       
       Tasks:
-      1. Choose a specific writing skill topic (e.g., "如何讓文章更生動", "神奇的成語", "標點符號大冒險", "描寫人物的技巧").
-      2. 'vocabulary': Teach ${questionCount} writing techniques, idioms (成語), or rhetorical devices (修辭).
-         - 'word': The Technique or Idiom in **Traditional Chinese** (e.g., "譬喻法", "開門見山法", "成語: 車水馬龍").
-         - 'chinese': A simple explanation of the technique/idiom.
-         - 'partOfSpeech': Use '寫作技巧' or '成語'.
-         - 'exampleSentence': An excellent example sentence using this technique/idiom in Chinese.
-         - 'exampleTranslation': Analysis/Tip: Explain *why* this sentence is good or how the technique works (in Chinese).
-         - 'emoji': A relevant emoji.
-      3. 'quiz': Create ${questionCount} multiple-choice questions testing these skills.
-         - 'question': A question about usage, identifying the rhetoric, or filling in the blank with the correct idiom.
-         - 'chineseTranslation': Leave empty string "" as it is all Chinese.
-         - 'explanation': Educational explanation of the correct answer.
-         - 'options': Chinese answers.
+      1. 'vocabulary': Teach ${questionCount} concepts/phenomena.
+         - 'word': The Term (Traditional Chinese).
+         - 'partOfSpeech': The Category/Group (Traditional Chinese, e.g., "導體", "絕緣體").
+         - 'chinese': Simple definition.
+         - 'exampleTranslation': Fun fact or explanation.
+      2. 'quiz': Scenario-based MCQs.
     `;
   }
 
   const prompt = `
     ${subjectPrompt}
-    
-    Output JSON format only.
-    Use Traditional Chinese (繁體中文) for translations/explanations.
-    The 'explanation' in the quiz should be encouraging and educational.
-    Ensure strict JSON validity.
+    Output JSON format only. Use Traditional Chinese (繁體中文).
+    Format must strictly match the responseSchema.
   `;
 
   try {
@@ -145,16 +112,15 @@ export const generateLessonForGrade = async (
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            topic: { type: Type.STRING, description: "Topic title" },
-            chineseTopic: { type: Type.STRING, description: "Chinese topic title" },
+            topic: { type: Type.STRING },
+            chineseTopic: { type: Type.STRING },
             vocabulary: {
               type: Type.ARRAY,
-              description: `List of ${questionCount} learning items`,
               items: {
                 type: Type.OBJECT,
                 properties: {
                   word: { type: Type.STRING },
-                  emoji: { type: Type.STRING, description: "Relevant emoji" },
+                  emoji: { type: Type.STRING },
                   partOfSpeech: { type: Type.STRING },
                   chinese: { type: Type.STRING },
                   exampleSentence: { type: Type.STRING },
@@ -165,7 +131,6 @@ export const generateLessonForGrade = async (
             },
             quiz: {
               type: Type.ARRAY,
-              description: `List of ${questionCount} questions`,
               items: {
                 type: Type.OBJECT,
                 properties: {

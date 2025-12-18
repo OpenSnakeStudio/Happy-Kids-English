@@ -8,15 +8,15 @@ export enum GradeLevel {
   SIX = 6
 }
 
-export type Subject = 'ENGLISH' | 'MATH' | 'WRITING';
+export type Subject = 'ENGLISH' | 'MATH' | 'WRITING' | 'SCIENCE';
 
 export interface VocabularyItem {
-  word: string; // The English word or phrase OR Math Term OR Writing Technique
+  word: string; // The English word OR Math Term OR Writing Technique OR Scientific Concept
   emoji: string; // Visual cue
-  partOfSpeech: string; // (n.) (v.) OR (Math Concept)
+  partOfSpeech: string; // (n.) (v.) OR (Math Category) OR (Scientific Category/Principle)
   chinese: string; // Chinese meaning / Explanation
-  exampleSentence: string; // Simple example / Math Formula example
-  exampleTranslation: string; // Translation of example
+  exampleSentence: string; // Simple example / Formula / Experiment outcome
+  exampleTranslation: string; // Translation / Detailed explanation
 }
 
 export interface QuizItem {
@@ -24,7 +24,7 @@ export interface QuizItem {
   question: string;
   options: string[];
   correctAnswer: string;
-  chineseTranslation: string; // Or Hint for Math
+  chineseTranslation: string; // Or Hint
   explanation: string;
 }
 
@@ -45,7 +45,7 @@ export interface AppState {
   currentGrade: GradeLevel | null;
   lessonData: LessonData | null;
   isLoading: boolean;
-  gameStatus: 'MENU' | 'SUBJECT_SELECTION' | 'MATH_TOPIC_SELECTION' | 'ENGLISH_TOPIC_SELECTION' | 'STUDY' | 'GAME_SELECTION' | 'GAME_MATCHING' | 'GAME_SPELLING' | 'GAME_WORD_SCRAMBLE' | 'GAME_MATH_CHALLENGE' | 'GAME_NUMBER_PUZZLE' | 'GAME_GEOMETRY_BUILDER' | 'GAME_SENTENCE_BUILDER' | 'GAME_IDIOM_DOJO' | 'PLAYING' | 'FINISHED';
+  gameStatus: 'MENU' | 'SUBJECT_SELECTION' | 'MATH_TOPIC_SELECTION' | 'ENGLISH_TOPIC_SELECTION' | 'WRITING_TOPIC_SELECTION' | 'SCIENCE_TOPIC_SELECTION' | 'STUDY' | 'GAME_SELECTION' | 'GAME_MATCHING' | 'GAME_SPELLING' | 'GAME_WORD_SCRAMBLE' | 'GAME_MATH_CHALLENGE' | 'GAME_NUMBER_PUZZLE' | 'GAME_GEOMETRY_BUILDER' | 'GAME_SENTENCE_BUILDER' | 'GAME_IDIOM_DOJO' | 'GAME_SCIENCE_SORT' | 'GAME_SCIENCE_CYCLE' | 'PLAYING' | 'FINISHED';
   score: number;
   currentQuestionIndex: number;
   wrongAnswers: WrongAnswer[]; 
