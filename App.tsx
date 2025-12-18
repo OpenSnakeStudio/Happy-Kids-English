@@ -88,6 +88,11 @@ export default function App() {
     setState(prev => ({ ...prev, gameStatus: 'STUDY', score: 0, currentQuestionIndex: 0, wrongAnswers: [] }));
   };
 
+  const retakeQuiz = () => {
+    playSFX('click');
+    setState(prev => ({ ...prev, gameStatus: 'PLAYING', score: 0, currentQuestionIndex: 0, wrongAnswers: [] }));
+  };
+
   const handleGameSelect = (gameMode: AppState['gameStatus']) => {
     playSFX('click');
     setState(prev => ({ ...prev, gameStatus: gameMode }));
@@ -110,6 +115,7 @@ export default function App() {
   const speak = (text: string, speed: number = 0.9) => {
     if (state.currentSubject !== 'ENGLISH') return;
     if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
       const spokenText = text.replace(/_+/g, ' blank ');
       const utterance = new SpeechSynthesisUtterance(spokenText);
       utterance.lang = 'en-US';
@@ -159,7 +165,7 @@ export default function App() {
       </header>
 
       <main className="py-8 min-h-[calc(100vh-64px)] flex flex-col items-center justify-center">
-        {errorMsg && <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-xl max-w-md text-center">{errorMsg}</div>}
+        {errorMsg && <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-xl max-w-md text-center shadow-lg border border-red-200">{errorMsg}</div>}
         
         {state.isLoading && (
           <div className="flex flex-col items-center animate-pulse text-center">
@@ -184,25 +190,17 @@ export default function App() {
 
         {!state.isLoading && state.gameStatus === 'MENU' && (
           <div className="w-full max-w-4xl px-6 animate-fade-in-up text-center">
-            <button onClick={handleBackToSubjects} className="mb-8 text-gray-400 font-bold">⬅️ 選其他科目</button>
+            <button onClick={handleBackToSubjects} className="mb-8 text-gray-400 font-bold hover:text-gray-600 transition-colors">⬅️ 選其他科目</button>
             <h2 className={`text-4xl font-bold mb-4 ${meta.color}`}>{meta.icon} {meta.name}</h2>
             
-            {/* Question Count Selector */}
             <div className="flex flex-col items-center mb-10">
-              <label className="text-gray-400 font-bold mb-3 uppercase tracking-wider text-sm">
-                題目數量 (Number of Questions)
-              </label>
+              <label className="text-gray-400 font-bold mb-3 uppercase tracking-wider text-sm">題目數量 (Number of Questions)</label>
               <div className="flex bg-white p-1.5 rounded-2xl shadow-md border border-gray-100">
                 {[5, 10, 20].map(count => (
                   <button
                     key={count}
                     onClick={() => { playSFX('click'); setQuestionCount(count); }}
-                    className={`
-                      px-6 py-2.5 rounded-xl font-bold transition-all duration-200
-                      ${questionCount === count 
-                        ? 'bg-gray-800 text-white shadow-sm scale-105' 
-                        : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'}
-                    `}
+                    className={`px-6 py-2.5 rounded-xl font-bold transition-all duration-200 ${questionCount === count ? 'bg-gray-800 text-white shadow-sm scale-105' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-600'}`}
                   >
                     {count} 題
                   </button>
@@ -231,14 +229,12 @@ export default function App() {
              <h2 className="text-3xl font-bold mb-10">複習挑戰</h2>
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                <button onClick={() => handleGameSelect('GAME_MATCHING')} className="bg-white p-6 rounded-3xl shadow-xl border-b-8 border-teal-100 hover:-translate-y-2"><div className="text-4xl mb-2">🧩</div><h3 className="font-bold">連連看</h3></button>
-               
                {isEnglish && (
                  <>
                    <button onClick={() => handleGameSelect('GAME_WORD_SCRAMBLE')} className="bg-white p-6 rounded-3xl shadow-xl border-b-8 border-violet-100 hover:-translate-y-2"><div className="text-4xl mb-2">🔤</div><h3 className="font-bold">字母大亂鬥</h3></button>
                    {state.currentGrade! >= 4 && <button onClick={() => handleGameSelect('GAME_SPELLING')} className="bg-white p-6 rounded-3xl shadow-xl border-b-8 border-orange-100 hover:-translate-y-2"><div className="text-4xl mb-2">✏️</div><h3 className="font-bold">拼字練習</h3></button>}
                  </>
                )}
-
                {isMath && (
                  <>
                    <button onClick={() => handleGameSelect('GAME_MATH_CHALLENGE')} className="bg-white p-6 rounded-3xl shadow-xl border-b-8 border-blue-100 hover:-translate-y-2"><div className="text-4xl mb-2">🚀</div><h3 className="font-bold">急速快算</h3></button>
@@ -246,14 +242,12 @@ export default function App() {
                    <button onClick={() => handleGameSelect('GAME_GEOMETRY_BUILDER')} className="bg-white p-6 rounded-3xl shadow-xl border-b-8 border-cyan-100 hover:-translate-y-2"><div className="text-4xl mb-2">📐</div><h3 className="font-bold">形狀建築師</h3></button>
                  </>
                )}
-
                {isWriting && (
                  <>
                    <button onClick={() => handleGameSelect('GAME_SENTENCE_BUILDER')} className="bg-white p-6 rounded-3xl shadow-xl border-b-8 border-pink-100 hover:-translate-y-2"><div className="text-4xl mb-2">📝</div><h3 className="font-bold">句子積木</h3></button>
                    <button onClick={() => handleGameSelect('GAME_IDIOM_DOJO')} className="bg-white p-6 rounded-3xl shadow-xl border-b-8 border-orange-100 hover:-translate-y-2"><div className="text-4xl mb-2">🥋</div><h3 className="font-bold">成語修煉</h3></button>
                  </>
                )}
-
                {isScience && (
                  <>
                    <button onClick={() => handleGameSelect('GAME_SCIENCE_SORT')} className="bg-white p-6 rounded-3xl shadow-xl border-b-8 border-green-100 hover:-translate-y-2"><div className="text-4xl mb-2">🧪</div><h3 className="font-bold">分類大挑戰</h3></button>
@@ -261,7 +255,7 @@ export default function App() {
                  </>
                )}
              </div>
-             <button onClick={startQuiz} className="mt-12 text-gray-400 font-bold underline">直接開始總測驗 ➜</button>
+             <button onClick={startQuiz} className="mt-12 text-gray-400 font-bold underline hover:text-gray-600 transition-colors">直接開始總測驗 ➜</button>
            </div>
         )}
 
@@ -279,16 +273,86 @@ export default function App() {
         {!state.isLoading && state.gameStatus === 'PLAYING' && <QuizGame questions={state.lessonData!.quiz} onFinish={handleFinish} onExit={resetGame} subject={state.currentSubject!} />}
 
         {!state.isLoading && state.gameStatus === 'FINISHED' && (
-          <div className="w-full max-w-2xl px-4 animate-fade-in-up text-center">
-            <div className="bg-white p-10 rounded-3xl shadow-2xl border-b-8 border-gray-100">
-              <div className="text-8xl mb-6">🏆</div>
-              <h2 className="text-3xl font-bold mb-4">課程完成！</h2>
-              <div className="bg-sky-50 rounded-2xl p-6 mb-8">
-                <div className="text-8xl font-black text-primary mb-4">{Math.round((state.score / state.lessonData!.quiz.length) * 100)}<span className="text-4xl">分</span></div>
-                <div className="text-xl font-bold text-sky-600">答對 {state.score} / {state.lessonData!.quiz.length} 題</div>
+          <div className="w-full max-w-2xl px-4 pb-12 animate-fade-in-up text-center">
+            <div className="bg-white p-10 rounded-3xl shadow-2xl border-b-8 border-gray-100 mb-8">
+              <div className="text-8xl mb-6 animate-bounce-slow">🏆</div>
+              <h2 className="text-3xl font-bold mb-2">測驗完成！</h2>
+              <p className="text-gray-500 mb-6 font-medium">主題：{state.lessonData?.chineseTopic}</p>
+              
+              <div className="bg-sky-50 rounded-2xl p-6 mb-8 flex flex-col items-center">
+                <div className="text-gray-500 text-sm font-bold uppercase tracking-wider mb-2">您的總分</div>
+                <div className="text-8xl font-black text-primary mb-2">
+                  {Math.round((state.score / state.lessonData!.quiz.length) * 100)}
+                  <span className="text-4xl ml-1">分</span>
+                </div>
+                <div className="text-xl font-bold text-sky-600 bg-white px-4 py-1 rounded-full shadow-sm border border-sky-100">
+                  答對 {state.score} / {state.lessonData!.quiz.length} 題
+                </div>
               </div>
-              <button onClick={resetGame} className="w-full bg-primary text-yellow-900 py-3 rounded-xl font-bold text-lg shadow-md">回首頁</button>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <button onClick={retakeQuiz} className="bg-secondary text-white py-3 rounded-xl font-bold text-lg shadow-md hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2">
+                  ✍️ 直接重測 (Retake Quiz)
+                </button>
+                <button onClick={restartLesson} className="bg-yellow-400 text-yellow-900 py-3 rounded-xl font-bold text-lg shadow-md hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
+                  🔄 重新溫習 (Review Cards)
+                </button>
+                <button onClick={() => handleGradeSelect(state.currentGrade!)} className="bg-sky-500 text-white py-3 rounded-xl font-bold text-lg shadow-md hover:brightness-105 active:scale-95 transition-all flex items-center justify-center gap-2">
+                  ✨ 練習新主題 (New Lesson)
+                </button>
+                <button onClick={resetGame} className="bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-lg hover:bg-gray-200 transition-colors">
+                  🏠 回首頁 (Home)
+                </button>
+              </div>
             </div>
+
+            {/* MISTAKE REVIEW SECTION */}
+            {state.wrongAnswers.length > 0 && (
+              <div className="animate-fade-in-up mt-10">
+                <h3 className="text-2xl font-black text-gray-700 mb-6 text-center flex items-center justify-center gap-2">
+                  📝 錯題詳解 (Review Mistakes)
+                </h3>
+                <div className="space-y-6">
+                  {state.wrongAnswers.map((wa, idx) => (
+                    <div key={idx} className="bg-white rounded-3xl p-6 shadow-xl border-l-8 border-red-500 text-left relative overflow-hidden">
+                      <div className="absolute top-0 right-0 p-2 bg-red-50 text-red-500 font-bold text-xs rounded-bl-xl">
+                        #{idx + 1}
+                      </div>
+                      
+                      <div className="flex justify-between items-start mb-4">
+                        <h4 className="text-xl font-bold text-gray-800 pr-8">{wa.quizItem.question}</h4>
+                        {isEnglish && (
+                          <button onClick={() => speak(wa.quizItem.question)} className="text-sky-500 hover:text-sky-600 transition-colors">
+                            🔊
+                          </button>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <div className="bg-red-50 p-3 rounded-xl border border-red-100">
+                          <span className="text-xs text-red-400 font-black uppercase block mb-1">您的回答 (You Chose)</span>
+                          <span className="text-red-700 font-bold">❌ {wa.selectedAnswer}</span>
+                        </div>
+                        <div className="bg-green-50 p-3 rounded-xl border border-green-100">
+                          <span className="text-xs text-green-500 font-black uppercase block mb-1">正確答案 (Correct)</span>
+                          <span className="text-green-700 font-bold">✅ {wa.quizItem.correctAnswer}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xl">💡</span>
+                          <span className="text-sm font-black text-gray-400">老師解析 (Explanation)</span>
+                        </div>
+                        <p className="text-gray-600 leading-relaxed font-medium">
+                          {wa.quizItem.explanation}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>

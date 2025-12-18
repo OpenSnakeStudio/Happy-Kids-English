@@ -23,16 +23,14 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
   const currentQ = questions[currentIdx];
   const isMath = subject === 'MATH';
   const isWriting = subject === 'WRITING';
-  const shouldSpeak = !isMath && !isWriting;
+  const isScience = subject === 'SCIENCE';
+  const shouldSpeak = !isMath && !isWriting && !isScience;
 
   const handleSpeech = (text: string, speed: number = 0.9) => {
-    // Disable speech for Math and Writing
     if (!shouldSpeak) return;
-
     if ('speechSynthesis' in window) {
-      // Replace underscores with "blank" so it reads naturally
+      window.speechSynthesis.cancel();
       const spokenText = text.replace(/_+/g, ' blank ');
-      
       const utterance = new SpeechSynthesisUtterance(spokenText);
       utterance.lang = 'en-US';
       utterance.rate = speed; 
@@ -41,7 +39,6 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
   };
 
   useEffect(() => {
-    // Auto speak question when it loads (ONLY if NOT Math/Writing)
     if (shouldSpeak) {
       handleSpeech(questions[currentIdx].question, 0.9);
     }
@@ -68,7 +65,6 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
       setShake(true);
       setTimeout(() => setShake(false), 500);
       
-      // Record wrong answer
       setWrongAnswers(prev => [...prev, {
         quizItem: currentQ,
         selectedAnswer: option
@@ -78,15 +74,13 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
 
   const nextQuestion = () => {
     playSFX('click');
-    setIsAnswered(false);
-    setSelectedAnswer(null);
-    setShowFeedback(false);
-
     if (currentIdx + 1 < questions.length) {
+      setIsAnswered(false);
+      setSelectedAnswer(null);
+      setShowFeedback(false);
       setCurrentIdx(c => c + 1);
     } else {
-      // Pass both score and wrong answers list
-      // Play win sound if score is good
+      // Game Over - Pass the latest values
       if (score > questions.length / 2) {
         playSFX('win');
       }
@@ -97,20 +91,20 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
   const progress = ((currentIdx) / questions.length) * 100;
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4">
+    <div className="w-full max-w-2xl mx-auto px-4 animate-fade-in-up">
       {/* Top Bar */}
       <div className="flex justify-between items-center mb-6">
-        <button onClick={() => { playSFX('click'); onExit(); }} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm">
+        <button onClick={() => { playSFX('click'); onExit(); }} className="text-gray-500 hover:text-red-500 font-bold bg-white px-4 py-2 rounded-full shadow-sm transition-colors">
           ✕ 離開
         </button>
-        <div className="flex-1 mx-4 bg-gray-200 rounded-full h-4">
+        <div className="flex-1 mx-4 bg-gray-200 rounded-full h-4 overflow-hidden">
           <div 
             className="bg-secondary h-4 rounded-full transition-all duration-500" 
             style={{ width: `${progress}%` }}
           ></div>
         </div>
-        <div className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full font-bold shadow-sm">
-          ⭐ {score}
+        <div className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full font-bold shadow-sm whitespace-nowrap">
+          ⭐ {score} / {questions.length}
         </div>
       </div>
 
@@ -128,13 +122,13 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
               onClick={() => handleSpeech(currentQ.question, 0.9)}
               className="bg-blue-100 text-blue-600 hover:bg-blue-200 px-4 py-2 rounded-full text-sm font-bold inline-flex items-center gap-2 transition-colors"
             >
-              🔊 聽題目 (Listen)
+              🔊 聽題目
             </button>
             <button 
               onClick={() => handleSpeech(currentQ.question, 0.5)}
               className="bg-green-100 text-green-600 hover:bg-green-200 px-4 py-2 rounded-full text-sm font-bold inline-flex items-center gap-2 transition-colors"
             >
-              🐢 慢速 (Slow)
+              🐢 慢速
             </button>
           </div>
         )}
@@ -178,18 +172,18 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
         })}
       </div>
 
-      {/* Feedback Overlay / Bottom Sheet */}
+      {/* Feedback Overlay */}
       {showFeedback && (
         <div className="mt-6 animate-fade-in-up">
           <div className={`
             p-6 rounded-2xl border-l-8 shadow-md flex flex-col md:flex-row items-center justify-between gap-4
             ${selectedAnswer === currentQ.correctAnswer ? 'bg-green-50 border-green-500' : 'bg-orange-50 border-orange-400'}
           `}>
-            <div className="text-left">
+            <div className="text-left flex-1">
               <h3 className={`text-xl font-bold mb-1 ${selectedAnswer === currentQ.correctAnswer ? 'text-green-700' : 'text-orange-700'}`}>
                 {selectedAnswer === currentQ.correctAnswer ? '🎉 答對了！ Awesome!' : '💪 再接再厲！ Try Again!'}
               </h3>
-              <p className="text-gray-600">{currentQ.explanation}</p>
+              <p className="text-gray-600 text-sm leading-relaxed">{currentQ.explanation}</p>
             </div>
             
             <button
