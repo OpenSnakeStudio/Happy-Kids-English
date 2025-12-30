@@ -4,13 +4,13 @@
 
 # Happy Kids English - 快樂小學堂 🎓
 
-[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/truedano/Happy-Kids-English)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/truedano/Happy-Kids-English)
 [![License](https://img.shields.io/badge/license-Open%20Source-green.svg)](https://github.com/truedano/Happy-Kids-English)
 [![React](https://img.shields.io/badge/React-19.2.0-61dafb.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue.svg)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.2.0-646cff.svg)](https://vitejs.dev/)
 
-> **版本**: 1.2.0 | **最後更新**: 2025-12-30 | **狀態**: ✅ 已部署到 GitHub Pages
+> **版本**: 1.3.0 | **最後更新**: 2025-12-30 | **狀態**: ✅ 已部署到 GitHub Pages
 
 一個互動式、AI 驅動的學習應用程式,專為小學生(1-6 年級)設計,支援英語、數學、寫作和自然科學四大科目。
 
@@ -214,6 +214,11 @@ Happy-Kids-English/
 ## 📊 專案狀態
 
 ### 版本歷程
+- **v1.3.0** (2025-12-30)
+  - ✅ 新增 **API Key 嚴格驗證機制**：儲存金鑰池前將逐一進行連線測試，確保每一組金鑰均可正常運作
+  - 🔍 強化單一金鑰新增檢查：新增金鑰時立即點擊驗證，避免無效金鑰進入池中
+  - 🏗️ 優化代碼結構：統一模型名稱管理 (`GEMINI_MODEL`)，消除重複定義
+  - 🎨 修復 UI 層級問題：優化 Header `z-index`，解決設定選單被背景卡片遮擋的問題
 - **v1.2.0** (2025-12-30)
   - 🔒 新增 **localStorage API Key AES 加密** 保護
   - 🙈 隱藏 API Key 明文顯示功能，提升操作隱私
@@ -295,6 +300,6 @@ Happy-Kids-English/
 [![GitHub stars](https://img.shields.io/github/stars/truedano/Happy-Kids-English?style=social)](https://github.com/truedano/Happy-Kids-English/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/truedano/Happy-Kids-English?style=social)](https://github.com/truedano/Happy-Kids-English/network/members)
 
-**版本 1.2.0** | © 2025 Happy Kids English | [線上體驗](https://truedano.github.io/Happy-Kids-English/)
+**版本 1.3.0** | © 2025 Happy Kids English | [線上體驗](https://truedano.github.io/Happy-Kids-English/)
 
 </div>
