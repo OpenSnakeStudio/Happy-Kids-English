@@ -4,13 +4,13 @@
 
 # Happy Kids English - 快樂小學堂 🎓
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/truedano/Happy-Kids-English)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/truedano/Happy-Kids-English)
 [![License](https://img.shields.io/badge/license-Open%20Source-green.svg)](https://github.com/truedano/Happy-Kids-English)
 [![React](https://img.shields.io/badge/React-19.2.0-61dafb.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue.svg)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.2.0-646cff.svg)](https://vitejs.dev/)
 
-> **版本**: 1.1.0 | **最後更新**: 2025-12-30 | **狀態**: ✅ 已部署到 GitHub Pages
+> **版本**: 1.2.0 | **最後更新**: 2025-12-30 | **狀態**: ✅ 已部署到 GitHub Pages
 
 一個互動式、AI 驅動的學習應用程式,專為小學生(1-6 年級)設計,支援英語、數學、寫作和自然科學四大科目。
 
@@ -20,7 +20,7 @@
 - 🤖 **AI 生成內容**: 使用 Google Gemini AI 動態生成適齡教學內容
 - 🔄 **API Key 輪詢 (Round Robin)**: 支援多組 API Key 自動輪替，分散配額壓力
 - 🎮 **多樣化遊戲**: 連連看、拼字、數學挑戰等多種互動遊戲
-- 🔒 **隱私優先**: API Key 只儲存在您的瀏覽器本機
+- 🔒 **隱私與安全**: API Key 採 AES 加密儲存於瀏覽器本機，且不支援介面明文顯示
 - 💰 **完全免費**: 使用您自己的 Google Gemini API 免費配額
 
 ### 📚 支援科目
@@ -214,6 +214,11 @@ Happy-Kids-English/
 ## 📊 專案狀態
 
 ### 版本歷程
+- **v1.2.0** (2025-12-30)
+  - 🔒 新增 **localStorage API Key AES 加密** 保護
+  - 🙈 隱藏 API Key 明文顯示功能，提升操作隱私
+  - 📐 補全數學科目 **「給我一個驚喜」** 隨機主題生成功能
+  - 🎨 統一全科目隨機按鈕視覺與音效體驗
 - **v1.1.0** (2025-12-30)
   - 🔄 新增 **API Key 輪詢 (Round Robin)** 功能
   - 🛠️ 重構金鑰管理系統，支援多組 API Key 批量新增與刪除
@@ -290,6 +295,6 @@ Happy-Kids-English/
 [![GitHub stars](https://img.shields.io/github/stars/truedano/Happy-Kids-English?style=social)](https://github.com/truedano/Happy-Kids-English/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/truedano/Happy-Kids-English?style=social)](https://github.com/truedano/Happy-Kids-English/network/members)
 
-**版本 1.1.0** | © 2025 Happy Kids English | [線上體驗](https://truedano.github.io/Happy-Kids-English/)
+**版本 1.2.0** | © 2025 Happy Kids English | [線上體驗](https://truedano.github.io/Happy-Kids-English/)
 
 </div>

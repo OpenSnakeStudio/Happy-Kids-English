@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import packageJson from './package.json';
 import { GradeCard } from './components/GradeCard';
 import { SubjectCard } from './components/SubjectCard';
 import { QuizGame } from './components/QuizGame';
@@ -205,7 +206,7 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Learning App</span>
                 <span className="text-[8px] px-1.5 py-0.5 bg-gray-100 text-gray-500 rounded-md border border-gray-200 font-mono font-black scale-90 origin-left">
-                  V1.1.0
+                  V{packageJson.version}
                 </span>
               </div>
             </div>
