@@ -23,7 +23,7 @@ import { ApiKeySettings } from './components/ApiKeySettings';
 import { generateLessonForGrade } from './services/geminiService';
 import { GradeLevel, AppState, WrongAnswer, Subject } from './types';
 import { playSFX } from './services/audioService';
-import { getStoredApiKey, saveApiKey, clearApiKey } from './services/apiKeyManager';
+import { getApiKeyPool, saveApiKeyPool, clearApiKey } from './services/apiKeyManager';
 
 const INITIAL_STATE: AppState = {
   currentSubject: null,
@@ -41,34 +41,34 @@ export default function App() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [questionCount, setQuestionCount] = useState<number>(5);
   const [selectedTopic, setSelectedTopic] = useState<string | undefined>(undefined);
-  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [apiKeys, setApiKeys] = useState<string[]>([]);
   const [showApiKeyModal, setShowApiKeyModal] = useState(false);
 
-  // 初始化時檢查是否有儲存的 API Key
+  // 初始化時檢查是否有儲存的 API Key 池
   useEffect(() => {
-    const storedKey = getStoredApiKey();
-    setApiKey(storedKey);
-    if (!storedKey) {
+    const pool = getApiKeyPool();
+    setApiKeys(pool);
+    if (pool.length === 0) {
       setShowApiKeyModal(true);
     }
   }, []);
 
   // API Key 管理函數
-  const handleSaveApiKey = (newApiKey: string) => {
-    saveApiKey(newApiKey);
-    setApiKey(newApiKey);
+  const handleSaveApiKeys = (newPool: string[]) => {
+    saveApiKeyPool(newPool);
+    setApiKeys(newPool);
     setShowApiKeyModal(false);
     setErrorMsg(null);
   };
 
-  const handleUpdateApiKey = (newApiKey: string) => {
-    saveApiKey(newApiKey);
-    setApiKey(newApiKey);
+  const handleUpdateApiKeys = (newPool: string[]) => {
+    saveApiKeyPool(newPool);
+    setApiKeys(newPool);
   };
 
-  const handleClearApiKey = () => {
+  const handleClearApiKeys = () => {
     clearApiKey();
-    setApiKey(null);
+    setApiKeys([]);
     setShowApiKeyModal(true);
     setState(INITIAL_STATE);
   };
@@ -102,8 +102,8 @@ export default function App() {
   const handleScienceTopicSelect = (topic: string) => generateLesson(state.currentGrade!, 'SCIENCE', topic);
 
   const generateLesson = async (grade: GradeLevel, subject: Subject, topic?: string) => {
-    // 檢查 API Key
-    if (!apiKey) {
+    // 檢查 API Key 池
+    if (apiKeys.length === 0) {
       setErrorMsg("❌ 請先設定 API Key 才能使用 AI 功能");
       setShowApiKeyModal(true);
       return;
@@ -192,8 +192,8 @@ export default function App() {
       {/* API Key 設定彈窗 */}
       <ApiKeyModal
         isOpen={showApiKeyModal}
-        onSave={handleSaveApiKey}
-        onClose={apiKey ? () => setShowApiKeyModal(false) : undefined}
+        onSave={handleSaveApiKeys}
+        onClose={apiKeys.length > 0 ? () => setShowApiKeyModal(false) : undefined}
       />
 
       <header className="bg-white shadow-sm sticky top-0 z-10">
@@ -220,9 +220,9 @@ export default function App() {
             {/* API Key 設定按鈕 */}
             <div className="relative">
               <ApiKeySettings
-                currentApiKey={apiKey}
-                onUpdate={handleUpdateApiKey}
-                onClear={handleClearApiKey}
+                apiKeys={apiKeys}
+                onUpdate={handleUpdateApiKeys}
+                onClear={handleClearApiKeys}
               />
             </div>
           </div>
