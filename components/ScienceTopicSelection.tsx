@@ -29,7 +29,7 @@ export const ScienceTopicSelection: React.FC<ScienceTopicSelectionProps> = ({ gr
 
   return (
     <div className="w-full max-w-4xl mx-auto px-6 animate-fade-in-up">
-      <button 
+      <button
         onClick={() => { playSFX('click'); onBack(); }}
         className="mb-8 text-gray-400 hover:text-gray-600 font-bold flex items-center gap-2 transition-colors"
       >
@@ -41,7 +41,7 @@ export const ScienceTopicSelection: React.FC<ScienceTopicSelectionProps> = ({ gr
           {stageTitle}
         </div>
         <h2 className="text-4xl font-bold text-green-600 mb-4">
-           {grade} 年級自然科學
+          {grade} 年級自然科學
         </h2>
         <p className="text-xl text-gray-500">
           {stageDesc}
@@ -65,21 +65,21 @@ export const ScienceTopicSelection: React.FC<ScienceTopicSelectionProps> = ({ gr
             </div>
           </button>
         ))}
-        
+
         {/* Surprise Me Option */}
         <button
-            onClick={() => { playSFX('click'); onSelectTopic("Surprise Me"); }}
-            className="bg-gradient-to-r from-green-400 to-emerald-500 p-6 rounded-2xl shadow-md border-l-8 border-green-700 hover:brightness-110 hover:scale-[1.02] transition-all text-left group"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-bold text-white">
-                🌱 給我一個科學驚喜 (Surprise Me)
-              </span>
-              <span className="text-2xl text-white">
-                🧪
-              </span>
-            </div>
-          </button>
+          onClick={() => { playSFX('click'); onSelectTopic("Surprise Me"); }}
+          className="bg-gradient-to-r from-green-400 to-emerald-500 p-6 rounded-2xl shadow-md border-l-8 border-green-700 hover:brightness-110 hover:scale-[1.02] transition-all text-left group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-lg font-bold text-white">
+              🌱 給我一個科學驚喜 (Surprise Me)
+            </span>
+            <span className="text-2xl text-white">
+              🎲
+            </span>
+          </div>
+        </button>
       </div>
     </div>
   );

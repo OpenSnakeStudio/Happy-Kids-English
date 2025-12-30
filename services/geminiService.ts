@@ -51,14 +51,16 @@ export const generateLessonForGrade = async (
 
   } else if (subject === 'MATH') {
     let mathTopic = specificTopic || "";
-    if (!mathTopic) {
-      if (grade <= 2) mathTopic = "100以內的加減法, 認識圖形";
-      else if (grade <= 4) mathTopic = "九九乘法表, 除法基礎, 分數";
-      else mathTopic = "小數運算, 因數與倍數, 幾何圖形";
+    let mathInstruction = "";
+
+    if (!mathTopic || mathTopic === "Surprise Me") {
+      mathInstruction = `Task: Select a creative and appropriate mathematical topic for Grade ${grade} students in the Taiwan curriculum. Then generate the lesson items.`;
+    } else {
+      mathInstruction = `Topic: "${mathTopic}".`;
     }
 
     subjectPrompt = `
-      Subject: Mathematics (Primary School Math for Taiwan). Grade: ${grade}. Topic: "${mathTopic}".
+      Subject: Mathematics (Primary School Math for Taiwan). Grade: ${grade}. ${mathInstruction}
       ${randomnessDirective}
       Tasks:
       1. 'vocabulary': Define exactly ${questionCount} key math concepts or terms. Use different numbers and contexts each time.
