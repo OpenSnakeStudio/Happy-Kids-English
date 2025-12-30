@@ -18,10 +18,13 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
   
   const isMath = subject === 'MATH';
   const isWriting = subject === 'WRITING';
-  const shouldSpeak = !isMath && !isWriting; // Only speak for English
+  const isScience = subject === 'SCIENCE';
+  // Define isEnglish to fix the compilation error on line 185
+  const isEnglish = subject === 'ENGLISH';
+  const shouldSpeak = isEnglish; // Only speak for English as requested
 
   const speak = (text: string, speed: number = 0.9) => {
-    // Disable speak for Math and Writing
+    // Only speak for English
     if (!shouldSpeak) return;
 
     if ('speechSynthesis' in window) {
@@ -67,7 +70,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
         </button>
         <div className="text-center">
           <h2 className="text-sm text-gray-500 font-bold uppercase tracking-wider">
-            {isMath ? '觀念卡 (Concept)' : (isWriting ? '寫作技巧 (Skill)' : "Today's Lesson")}
+            {isMath ? '觀念卡 (Concept)' : (isWriting ? '寫作技巧 (Skill)' : (isScience ? '科學概念 (Science)' : "Today's Lesson"))}
           </h2>
           <div className="text-xl font-bold text-sky-600">{chineseTopic || topic}</div>
         </div>
@@ -79,7 +82,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
       {/* Flashcard */}
       <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden border-b-8 border-sky-100 mb-8 transform transition-all">
         {/* Visual Header */}
-        <div className={`p-8 flex justify-center items-center h-48 relative ${isMath ? 'bg-blue-50' : (isWriting ? 'bg-pink-50' : 'bg-sky-50')}`}>
+        <div className={`p-8 flex justify-center items-center h-48 relative ${isMath ? 'bg-blue-50' : (isWriting ? 'bg-pink-50' : (isScience ? 'bg-green-50' : 'bg-sky-50'))}`}>
            <div className="absolute top-4 right-4 text-sky-200 text-6xl opacity-20 font-black">
              {currentIdx + 1}
            </div>
@@ -99,7 +102,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
             
             <div className="flex items-center gap-2">
               <span className="text-gray-400 font-serif italic text-lg">
-                {isMath ? '觀念' : (isWriting ? '技巧' : currentWord.partOfSpeech)}
+                {isMath ? '觀念' : (isWriting ? '技巧' : (isScience ? currentWord.partOfSpeech : currentWord.partOfSpeech))}
               </span>
               {shouldSpeak && (
                 <div className="flex gap-2">
@@ -131,10 +134,10 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
           <div className="w-full h-px bg-gray-100"></div>
 
           {/* Detailed Explanation / Formula */}
-          <div className={`bg-gray-50 rounded-xl p-4 text-left border border-gray-100 ${isMath || isWriting ? 'text-center' : ''}`}>
-            <div className={`flex items-start mb-2 ${isMath || isWriting ? 'justify-center' : 'justify-between'}`}>
+          <div className={`bg-gray-50 rounded-xl p-4 text-left border border-gray-100 ${isMath || isWriting || isScience ? 'text-center' : ''}`}>
+            <div className={`flex items-start mb-2 ${isMath || isWriting || isScience ? 'justify-center' : 'justify-between'}`}>
               <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                {isMath ? '公式/重點 (Formula)' : (isWriting ? '範例 (Example)' : 'Example')}
+                {isMath ? '公式/重點 (Formula)' : (isWriting ? '範例 (Example)' : (isScience ? '科學解釋 (Science Explains)' : 'Example'))}
               </span>
               {shouldSpeak && (
                 <div className="flex gap-2">
@@ -154,8 +157,8 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
             </p>
             
             {/* The Step-by-Step Logic or Translation */}
-            <p className={`text-gray-500 ${isMath || isWriting ? 'text-left bg-white p-3 rounded-lg text-sm border border-gray-100' : ''}`}>
-               {(isMath || isWriting) && <span className="block font-bold text-xs text-blue-400 mb-1">💡 小撇步/解析 (Tip):</span>}
+            <p className={`text-gray-500 ${isMath || isWriting || isScience ? 'text-left bg-white p-3 rounded-lg text-sm border border-gray-100' : ''}`}>
+               {(isMath || isWriting || isScience) && <span className="block font-bold text-xs text-blue-400 mb-1">💡 解析 (Explanation):</span>}
                {currentWord.exampleTranslation}
             </p>
           </div>
@@ -181,7 +184,7 @@ export const StudyMode: React.FC<StudyModeProps> = ({ topic, chineseTopic, vocab
           onClick={handleNext}
           className="flex-[2] bg-secondary text-white py-4 rounded-2xl font-bold text-xl shadow-lg shadow-teal-200/50 hover:brightness-105 active:scale-95 transition-all"
         >
-          {currentIdx === vocabulary.length - 1 ? '我學會了，開始測驗！ 🚀' : '下一個 (Next) ➜'}
+          {currentIdx === vocabulary.length - 1 ? (isEnglish ? '我學會了，開始測驗！ 🚀' : '完成溫習，開始挑戰！ 🚀') : '下一個 (Next) ➜'}
         </button>
       </div>
     </div>

@@ -24,7 +24,8 @@ export const QuizGame: React.FC<QuizGameProps> = ({ questions, onFinish, onExit,
   const isMath = subject === 'MATH';
   const isWriting = subject === 'WRITING';
   const isScience = subject === 'SCIENCE';
-  const shouldSpeak = !isMath && !isWriting && !isScience;
+  const isEnglish = subject === 'ENGLISH';
+  const shouldSpeak = isEnglish; // Only speak for English as requested
 
   const handleSpeech = (text: string, speed: number = 0.9) => {
     if (!shouldSpeak) return;

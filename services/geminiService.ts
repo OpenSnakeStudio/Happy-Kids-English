@@ -20,6 +20,9 @@ export const generateLessonForGrade = async (
 
   let subjectPrompt = "";
   
+  // Randomness directive to be included in all prompts
+  const randomnessDirective = "IMPORTANT: Every time this request is made, you MUST generate a UNIQUE set of items. Do not repeat the same words, examples, or questions from previous iterations of this topic. Be creative and vary the content extensively.";
+
   if (subject === 'ENGLISH') {
     let levelDesc = "";
     if (grade <= 2) levelDesc = "Beginner (A1). Concrete nouns, basic verbs, colors, numbers.";
@@ -37,8 +40,11 @@ export const generateLessonForGrade = async (
 
     subjectPrompt = `
       Subject: English Learning. Target Audience: Grade ${grade} (${levelDesc}). ${themeInstruction}
+      ${randomnessDirective}
       Tasks:
-      1. Catchy title. 2. Select ${questionCount} vocabulary words. 3. Create ${questionCount} MCQs.
+      1. Catchy title. 
+      2. Select exactly ${questionCount} vocabulary words. 
+      3. Create exactly ${questionCount} multiple-choice questions (MCQs).
       'word': English. 'chinese': Traditional Chinese. 'partOfSpeech': n, v, adj. 'exampleSentence': Simple English. 'exampleTranslation': Chinese.
     `;
 
@@ -52,14 +58,15 @@ export const generateLessonForGrade = async (
 
     subjectPrompt = `
       Subject: Mathematics (Primary School Math for Taiwan). Grade: ${grade}. Topic: "${mathTopic}".
+      ${randomnessDirective}
       Tasks:
-      1. 'vocabulary': Define ${questionCount} key math concepts or terms.
+      1. 'vocabulary': Define exactly ${questionCount} key math concepts or terms. Use different numbers and contexts each time.
          - 'word': Concept Name in Traditional Chinese.
          - 'chinese': Simple definition for kids.
          - 'partOfSpeech': '數學觀念'.
          - 'exampleSentence': Formula or Equation.
          - 'exampleTranslation': Step-by-step explanation.
-      2. 'quiz': Create ${questionCount} word problems. Detailed explanations required.
+      2. 'quiz': Create exactly ${questionCount} word problems. Detailed explanations required. Vary the story scenarios.
     `;
 
   } else if (subject === 'WRITING') {
@@ -68,12 +75,15 @@ export const generateLessonForGrade = async (
 
     subjectPrompt = `
       Subject: Chinese Composition. Grade: ${grade}. Skill: "${writingTopic}".
+      ${randomnessDirective}
       Tasks:
-      1. 'vocabulary': Teach ${questionCount} techniques/idioms.
+      1. 'vocabulary': Teach exactly ${questionCount} techniques/idioms. Vary the selection of idioms and sentences.
          - 'word': Technique name (e.g., 譬喻法).
          - 'partOfSpeech': '寫作技巧'.
+         - 'chinese': Simple definition.
+         - 'exampleSentence': A short example sentence using the technique.
          - 'exampleTranslation': Analysis of why it's good.
-      2. 'quiz': MCQs identifying techniques or improving sentences.
+      2. 'quiz': Create exactly ${questionCount} MCQs identifying techniques or improving sentences.
     `;
   } else if (subject === 'SCIENCE') {
     let scienceTopic = specificTopic || "General Science";
@@ -81,33 +91,37 @@ export const generateLessonForGrade = async (
 
     subjectPrompt = `
       Subject: Natural Science (Primary School for Taiwan). Grade: ${grade}. Topic: "${scienceTopic}".
+      ${randomnessDirective}
       
       SPECIAL REQUIREMENT for Science:
-      - The 'vocabulary' items should ideally be categorizable into 2-3 groups (e.g., if topic is "Acids and Bases", 3 items should be acidic, 2 basic).
-      - Put the group name in 'partOfSpeech' (e.g., '酸性', '鹼性', '中性').
-      - If the topic is a process (like Life Cycles), order the vocabulary items chronologically (e.g., Egg -> Larva -> Pupa -> Adult).
+      - The 'vocabulary' items should ideally be categorizable into 2-3 groups.
+      - Put the group name in 'partOfSpeech' (e.g., "導體", "絕緣體").
+      - If the topic is a process, order the items chronologically.
       
       Tasks:
-      1. 'vocabulary': Teach ${questionCount} concepts/phenomena.
+      1. 'vocabulary': Teach EXACTLY ${questionCount} concepts/phenomena. Use fresh examples of experiments or observations.
          - 'word': The Term (Traditional Chinese).
-         - 'partOfSpeech': The Category/Group (Traditional Chinese, e.g., "導體", "絕緣體").
+         - 'partOfSpeech': The Category/Group (Traditional Chinese).
          - 'chinese': Simple definition.
-         - 'exampleTranslation': Fun fact or explanation.
-      2. 'quiz': Scenario-based MCQs.
+         - 'exampleSentence': A related fact, observation, or simple formula.
+         - 'exampleTranslation': Detailed scientific explanation or "Why it happens".
+      2. 'quiz': Create EXACTLY ${questionCount} scenario-based MCQs. Vary the scientific problems presented.
     `;
   }
 
   const prompt = `
     ${subjectPrompt}
     Output JSON format only. Use Traditional Chinese (繁體中文).
+    IMPORTANT: You MUST generate exactly ${questionCount} items for the 'vocabulary' array AND exactly ${questionCount} items for the 'quiz' array.
     Format must strictly match the responseSchema.
   `;
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3-flash-preview',
       contents: prompt,
       config: {
+        temperature: 1.0, // Maximum randomness for creative variety
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.OBJECT,

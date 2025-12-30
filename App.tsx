@@ -36,7 +36,7 @@ const INITIAL_STATE: AppState = {
 export default function App() {
   const [state, setState] = useState<AppState>(INITIAL_STATE);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [questionCount, setQuestionCount] = useState<number>(10); 
+  const [questionCount, setQuestionCount] = useState<number>(5); // Changed default to 5
   const [selectedTopic, setSelectedTopic] = useState<string | undefined>(undefined); 
 
   const handleSubjectSelect = (subject: Subject) => {
