@@ -16,69 +16,9 @@
 
   <!-- Content Security Policy (CSP) -->
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://aistudiocdn.com https://cdn.jsdelivr.net; connect-src 'self' https://generativelanguage.googleapis.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' https://aistudiocdn.com https://cdn.jsdelivr.net; connect-src 'self' https://generativelanguage.googleapis.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
 
   <title>Happy Kids English v1.1.0 - 快樂小學堂</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            'primary': '#FFC107', // Amber
-            'secondary': '#4ECDC4', // Teal
-            'accent': '#FF6B6B', // Red-ish
-            'kids-blue': '#45B7D1',
-            'kids-green': '#96E6A1',
-          },
-          fontFamily: {
-            sans: ['"Comic Sans MS"', '"Chalkboard SE"', 'sans-serif'],
-          },
-          animation: {
-            'bounce-slow': 'bounce 3s infinite',
-            'wiggle': 'wiggle 0.5s ease-in-out',
-            'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
-            'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
-          },
-          keyframes: {
-            wiggle: {
-              '0%, 100%': { transform: 'rotate(-3deg)' },
-              '50%': { transform: 'rotate(3deg)' },
-            },
-            shake: {
-              '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
-              '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
-              '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
-              '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
-            },
-            fadeInUp: {
-              '0%': { opacity: '0', transform: 'translateY(20px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            }
-          }
-        },
-      },
-    }
-  </script>
-  <style>
-    /* Custom scrollbar for a cleaner look */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #888;
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: #555;
-    }
-  </style>
   <script type="importmap">
 {
   "imports": {
