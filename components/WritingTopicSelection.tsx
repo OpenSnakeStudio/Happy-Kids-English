@@ -29,7 +29,7 @@ export const WritingTopicSelection: React.FC<WritingTopicSelectionProps> = ({ gr
 
   return (
     <div className="w-full max-w-4xl mx-auto px-6 animate-fade-in-up">
-      <button 
+      <button
         onClick={() => { playSFX('click'); onBack(); }}
         className="mb-8 text-gray-400 hover:text-gray-600 font-bold flex items-center gap-2 transition-colors"
       >
@@ -41,7 +41,7 @@ export const WritingTopicSelection: React.FC<WritingTopicSelectionProps> = ({ gr
           {stageTitle}
         </div>
         <h2 className="text-4xl font-bold text-pink-600 mb-4">
-           {grade} 年級寫作練習
+          {grade} 年級寫作練習
         </h2>
         <p className="text-xl text-gray-500">
           {stageDesc}
@@ -65,21 +65,48 @@ export const WritingTopicSelection: React.FC<WritingTopicSelectionProps> = ({ gr
             </div>
           </button>
         ))}
-        
+
+        {/* Custom Topic Card */}
+        <div className="bg-white p-6 rounded-2xl shadow-md border-l-8 border-gray-300 flex items-center justify-between gap-4">
+          <div className="flex flex-col flex-1">
+            <span className="text-xs font-bold text-gray-400 uppercase mb-1">自訂主題 Custom</span>
+            <input
+              type="text"
+              placeholder="例如：我的寒假趣事..."
+              className="w-full px-3 py-1.5 rounded-lg border-2 border-gray-50 focus:border-pink-400 focus:outline-none text-sm"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const val = (e.target as HTMLInputElement).value;
+                  if (val.trim()) { playSFX('click'); onSelectTopic(val.trim()); }
+                }
+              }}
+            />
+          </div>
+          <button
+            onClick={(e) => {
+              const input = e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement;
+              if (input.value.trim()) { playSFX('click'); onSelectTopic(input.value.trim()); }
+            }}
+            className="bg-pink-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-pink-600 transition-colors shadow-sm"
+          >
+            GO
+          </button>
+        </div>
+
         {/* Surprise Me Option */}
         <button
-            onClick={() => { playSFX('click'); onSelectTopic("Surprise Me"); }}
-            className="bg-gradient-to-r from-pink-400 to-rose-400 p-6 rounded-2xl shadow-md border-l-8 border-pink-700 hover:brightness-110 hover:scale-[1.02] transition-all text-left group"
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-bold text-white">
-                ✨ 給我一個寫作驚喜 (Surprise Me)
-              </span>
-              <span className="text-2xl text-white">
-                🎲
-              </span>
-            </div>
-          </button>
+          onClick={() => { playSFX('click'); onSelectTopic("Surprise Me"); }}
+          className="bg-gradient-to-r from-pink-400 to-rose-400 p-6 rounded-2xl shadow-md border-l-8 border-pink-700 hover:brightness-110 hover:scale-[1.02] transition-all text-left group"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-lg font-bold text-white">
+              ✨ 給我一個寫作驚喜 (Surprise Me)
+            </span>
+            <span className="text-2xl text-white">
+              🎲
+            </span>
+          </div>
+        </button>
       </div>
     </div>
   );

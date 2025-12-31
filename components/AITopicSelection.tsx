@@ -66,7 +66,32 @@ export const AITopicSelection: React.FC<AITopicSelectionProps> = ({ grade, onSel
                     </button>
                 ))}
 
-                {/* Surprise Me Option */}
+                {/* Custom Topic Card */}
+                <div className="bg-white p-6 rounded-2xl shadow-md border-l-8 border-gray-300 flex items-center justify-between gap-4">
+                    <div className="flex flex-col flex-1">
+                        <span className="text-xs font-bold text-gray-400 uppercase mb-1">自訂主題 Custom</span>
+                        <input
+                            type="text"
+                            placeholder="例如：自動駕駛原理..."
+                            className="w-full px-3 py-1.5 rounded-lg border-2 border-gray-50 focus:border-indigo-400 focus:outline-none text-sm"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    const val = (e.target as HTMLInputElement).value;
+                                    if (val.trim()) { playSFX('click'); onSelectTopic(val.trim()); }
+                                }
+                            }}
+                        />
+                    </div>
+                    <button
+                        onClick={(e) => {
+                            const input = e.currentTarget.parentElement?.querySelector('input') as HTMLInputElement;
+                            if (input.value.trim()) { playSFX('click'); onSelectTopic(input.value.trim()); }
+                        }}
+                        className="bg-indigo-500 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-600 transition-colors shadow-sm"
+                    >
+                        GO
+                    </button>
+                </div>
                 <button
                     onClick={() => { playSFX('click'); onSelectTopic("Surprise Me"); }}
                     className="bg-gradient-to-r from-indigo-400 to-purple-500 p-6 rounded-2xl shadow-md border-l-8 border-indigo-700 hover:brightness-110 hover:scale-[1.02] transition-all text-left group"
