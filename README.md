@@ -1,12 +1,12 @@
 # Happy Kids English - 快樂小學堂 🎓
 
-[![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)](https://github.com/truedano/Happy-Kids-English)
+[![Version](https://img.shields.io/badge/version-1.5.1-blue.svg)](https://github.com/truedano/Happy-Kids-English)
 [![License](https://img.shields.io/badge/license-Open%20Source-green.svg)](https://github.com/truedano/Happy-Kids-English)
 [![React](https://img.shields.io/badge/React-19.2.0-61dafb.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-blue.svg)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.2.0-646cff.svg)](https://vitejs.dev/)
 
-> **版本**: 1.5.0 | **最後更新**: 2026-01-14 | **狀態**: ✅ 已部署到 GitHub Pages
+> **版本**: 1.5.1 | **最後更新**: 2026-01-28 | **狀態**: ✅ 已部署到 GitHub Pages
 
 一個互動式、AI 驅動的學習應用程式,專為小學生(1-6 年級)設計,支援英語、數學、寫作、自然科學、理財及 AI 智慧六大科目。
 
@@ -231,6 +231,12 @@ Happy-Kids-English/
 ## 📊 專案狀態
 
 ### 版本歷程
+- **v1.5.1** (2026-01-28)
+  - 🔤 **優化「字母大亂鬥 (Word Scramble)」小遊戲**：
+    - 新增 **「復原 (Undo)」** 功能：可點擊按鈕或按 `Backspace` 鍵移除最後一個選取的字母。
+    - 新增 **「重填 (Reset)」** 功能：一鍵清空所有已選字母並回到候選區。
+    - 支援 **「點選移除」**：直接點擊答案區的字母即可將其放回候選區，操作更直覺。
+    - 優化互動回饋：增加視覺引導與鍵盤支援，大幅提升拼字遊戲的流暢度。
 - **v1.5.0** (2026-01-14)
   - ⏳ **新增 API Key 頻率限制 (Rate Limiting)**： 
     - 實作每組 API Key 每分鐘最高 15 次請求的限制。
@@ -327,6 +333,6 @@ Happy-Kids-English/
 [![GitHub stars](https://img.shields.io/github/stars/truedano/Happy-Kids-English?style=social)](https://github.com/truedano/Happy-Kids-English/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/truedano/Happy-Kids-English?style=social)](https://github.com/truedano/Happy-Kids-English/network/members)
 
-**版本 1.5.0** | © 2026 Happy Kids English | [線上體驗](https://truedano.github.io/Happy-Kids-English/)
+**版本 1.5.1** | © 2026 Happy Kids English | [線上體驗](https://truedano.github.io/Happy-Kids-English/)
 
 </div>
